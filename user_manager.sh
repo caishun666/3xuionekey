@@ -84,7 +84,7 @@ def add_users_to_db(protocol, num_users, start_port):
                 "stream_settings": json.dumps(stream_settings),
                 "sniffing": json.dumps(sniffing),
                 "allocate": json.dumps(allocate),
-                "tag": ""  # 设置默认值
+                "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
         elif protocol == "socks":
@@ -101,7 +101,7 @@ def add_users_to_db(protocol, num_users, start_port):
                 "sniffing": sniffing,
                 "allocate": allocate,
                 "enable": 1,
-                "tag": ""  # 设置默认值
+                "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
         # 插入数据
@@ -165,7 +165,7 @@ def update_config_file(protocol, num_users, start_port):
                     "refresh": 5,
                     "concurrency": 3
                 },
-                "tag": ""  # 设置默认值
+                "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
         elif protocol == "socks":
@@ -177,7 +177,7 @@ def update_config_file(protocol, num_users, start_port):
                 "sniffing": '{"enabled":false,"destOverride":["http","tls","quic","fakedns"],"metadataOnly":false,"routeOnly":false}',
                 "allocator": '{"strategy":"always","refresh":5,"concurrency":3}',
                 "enable": 1,
-                "tag": ""  # 设置默认值
+                "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
         config["inbounds"].append(user_data)
