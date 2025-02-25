@@ -54,13 +54,23 @@ def add_users_to_db(protocol, num_users, start_port):
                     }
                 ]
             }
+            stream_settings = {
+                "network": "tcp",
+                "security": "none",
+                "tcpSettings": {
+                    "acceptProxyProtocol": False,
+                    "header": {
+                        "type": "none"
+                    }
+                }
+            }
             sniffing = {
                 "enabled": False,
                 "destOverride": ["http", "tls", "quic", "fakedns"],
                 "metadataOnly": False,
                 "routeOnly": False
             }
-            allocator = {
+            allocate = {
                 "strategy": "always",
                 "refresh": 5,
                 "concurrency": 3
@@ -70,32 +80,35 @@ def add_users_to_db(protocol, num_users, start_port):
                 "remark": remark,
                 "port": port,
                 "protocol": protocol,
-                "settings": settings,
-                "sniffing": sniffing,
-                "allocator": allocator
+                "settings": json.dumps(settings),
+                "stream_settings": json.dumps(stream_settings),
+                "sniffing": json.dumps(sniffing),
+                "allocate": json.dumps(allocate)
             }
 
         elif protocol == "socks":
             settings = '{"auth":"password","accounts":[{"user":"admin","pass":"admin"}],"udp":true,"ip":"127.0.0.1"}'
             sniffing = '{"enabled":false,"destOverride":["http","tls","quic","fakedns"],"metadataOnly":false,"routeOnly":false}'
-            allocator = '{"strategy":"always","refresh":5,"concurrency":3}'
+            allocate = '{"strategy":"always","refresh":5,"concurrency":3}'
 
             user_data = {
                 "remark": remark,
                 "port": port,
                 "protocol": protocol,
                 "settings": settings,
+                "stream_settings": "",
                 "sniffing": sniffing,
-                "allocator": allocator,
+                "allocate": allocate,
                 "enable": 1
             }
 
+        # 插入数据
         cursor.execute("INSERT INTO inbounds (remark, port, protocol, settings, stream_settings, sniffing, allocate) VALUES (?, ?, ?, ?, ?, ?, ?)",
-               (user_data["remark"], user_data["port"], user_data["protocol"], json.dumps(user_data["settings"]), json.dumps(user_data.get("streamSettings", {})), json.dumps(user_data.get("sniffing", {})), json.dumps(user_data.get("allocator", {}))))
+                       (user_data["remark"], user_data["port"], user_data["protocol"], user_data["settings"], user_data["stream_settings"], user_data["sniffing"], user_data["allocate"]))
 
     conn.commit()
     conn.close()
-    
+
 # 更新配置文件
 def update_config_file(protocol, num_users, start_port):
     config_path = "/usr/local/x-ui/bin/config.json"
@@ -132,7 +145,6 @@ def update_config_file(protocol, num_users, start_port):
                 "streamSettings": {
                     "network": "tcp",
                     "security": "none",
-                    "externalProxy": [],
                     "tcpSettings": {
                         "acceptProxyProtocol": False,
                         "header": {
@@ -169,6 +181,11 @@ def update_config_file(protocol, num_users, start_port):
     with open(config_path, "w") as f:
         json.dump(config, f, indent=4)
 
+# 重启 3XUI 服务
+def restart_xui_service():
+    print("正在重启 3XUI 服务...")
+    subprocess.run(["systemctl", "restart", "x-ui"])
+
 # 主函数
 def main():
     check_python()
@@ -185,6 +202,7 @@ def main():
 
     add_users_to_db(protocol, num_users, start_port)
     update_config_file(protocol, num_users, start_port)
+    restart_xui_service()
 
     print(f"成功添加了{num_users}个{protocol}用户，端口号从{start_port}开始。")
 
