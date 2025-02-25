@@ -124,64 +124,85 @@ def update_config_file(protocol, num_users, start_port):
 
         if protocol == "vmess":
             user_data = {
-                "remark": remark,
-                "port": port,
-                "protocol": protocol,
+                "listen": "0.0.0.0",  # 监听地址
+                "port": port,  # 端口号
+                "protocol": protocol,  # 协议类型
                 "settings": {
                     "clients": [
                         {
-                            "id": user_uuid,
-                            "security": "auto",
-                            "email": "",
-                            "limitIp": 0,
-                            "totalGB": 0,
-                            "expiryTime": 0,
-                            "enable": True,
-                            "tgId": "",
-                            "subId": "",
-                            "comment": "",
-                            "reset": 0
+                            "id": user_uuid,  # 客户端 UUID
+                            "security": "auto",  # 加密方式
+                            "email": "",  # 客户端邮箱
+                            "limitIp": 0,  # IP 限制
+                            "totalGB": 0,  # 总流量限制
+                            "expiryTime": 0,  # 过期时间
+                            "enable": True,  # 是否启用
+                            "tgId": "",  # Telegram ID
+                            "subId": "",  # 订阅 ID
+                            "comment": "",  # 备注
+                            "reset": 0  # 流量重置
                         }
                     ]
                 },
                 "streamSettings": {
-                    "network": "tcp",
-                    "security": "none",
+                    "network": "tcp",  # 网络协议
+                    "security": "none",  # 安全设置
                     "tcpSettings": {
-                        "acceptProxyProtocol": False,
+                        "acceptProxyProtocol": False,  # 是否接受代理协议
                         "header": {
-                            "type": "none"
+                            "type": "none"  # TCP 头部类型
                         }
                     }
                 },
                 "sniffing": {
-                    "enabled": False,
-                    "destOverride": ["http", "tls", "quic", "fakedns"],
-                    "metadataOnly": False,
-                    "routeOnly": False
+                    "enabled": False,  # 是否启用流量嗅探
+                    "destOverride": ["http", "tls", "quic", "fakedns"],  # 目标协议
+                    "metadataOnly": False,  # 是否仅嗅探元数据
+                    "routeOnly": False  # 是否仅用于路由
                 },
-                "allocator": {
-                    "strategy": "always",
-                    "refresh": 5,
-                    "concurrency": 3
+                "allocate": {
+                    "strategy": "always",  # 分配策略
+                    "refresh": 5,  # 刷新间隔
+                    "concurrency": 3  # 并发连接数
                 },
                 "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
         elif protocol == "socks":
             user_data = {
-                "remark": remark,
-                "port": port,
-                "protocol": protocol,
-                "settings": '{"auth":"password","accounts":[{"user":"admin","pass":"admin"}],"udp":true,"ip":"127.0.0.1"}',
-                "sniffing": '{"enabled":false,"destOverride":["http","tls","quic","fakedns"],"metadataOnly":false,"routeOnly":false}',
-                "allocator": '{"strategy":"always","refresh":5,"concurrency":3}',
-                "enable": 1,
+                "listen": "0.0.0.0",  # 监听地址
+                "port": port,  # 端口号
+                "protocol": protocol,  # 协议类型
+                "settings": {
+                    "auth": "password",  # 认证方式
+                    "accounts": [
+                        {
+                            "user": "admin",  # 用户名
+                            "pass": "admin"  # 密码
+                        }
+                    ],
+                    "udp": True,  # 是否支持 UDP
+                    "ip": "127.0.0.1"  # 绑定 IP
+                },
+                "streamSettings": None,  # 流设置
+                "sniffing": {
+                    "enabled": False,  # 是否启用流量嗅探
+                    "destOverride": ["http", "tls", "quic", "fakedns"],  # 目标协议
+                    "metadataOnly": False,  # 是否仅嗅探元数据
+                    "routeOnly": False  # 是否仅用于路由
+                },
+                "allocate": {
+                    "strategy": "always",  # 分配策略
+                    "refresh": 5,  # 刷新间隔
+                    "concurrency": 3  # 并发连接数
+                },
                 "tag": str(uuid.uuid4())  # 使用 UUID 生成唯一的 tag
             }
 
+        # 将新用户数据添加到 inbounds 部分
         config["inbounds"].append(user_data)
 
+    # 将更新后的配置写回文件
     with open(config_path, "w") as f:
         json.dump(config, f, indent=4)
 
