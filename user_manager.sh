@@ -83,7 +83,8 @@ def add_users_to_db(protocol, num_users, start_port):
                 "settings": json.dumps(settings),
                 "stream_settings": json.dumps(stream_settings),
                 "sniffing": json.dumps(sniffing),
-                "allocate": json.dumps(allocate)
+                "allocate": json.dumps(allocate),
+                "tag": ""  # 设置默认值
             }
 
         elif protocol == "socks":
@@ -99,12 +100,13 @@ def add_users_to_db(protocol, num_users, start_port):
                 "stream_settings": "",
                 "sniffing": sniffing,
                 "allocate": allocate,
-                "enable": 1
+                "enable": 1,
+                "tag": ""  # 设置默认值
             }
 
         # 插入数据
-        cursor.execute("INSERT INTO inbounds (remark, port, protocol, settings, stream_settings, sniffing, allocate) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                       (user_data["remark"], user_data["port"], user_data["protocol"], user_data["settings"], user_data["stream_settings"], user_data["sniffing"], user_data["allocate"]))
+        cursor.execute("INSERT INTO inbounds (remark, port, protocol, settings, stream_settings, sniffing, allocate, tag) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       (user_data["remark"], user_data["port"], user_data["protocol"], user_data["settings"], user_data["stream_settings"], user_data["sniffing"], user_data["allocate"], user_data["tag"]))
 
     conn.commit()
     conn.close()
@@ -162,7 +164,8 @@ def update_config_file(protocol, num_users, start_port):
                     "strategy": "always",
                     "refresh": 5,
                     "concurrency": 3
-                }
+                },
+                "tag": ""  # 设置默认值
             }
 
         elif protocol == "socks":
@@ -173,7 +176,8 @@ def update_config_file(protocol, num_users, start_port):
                 "settings": '{"auth":"password","accounts":[{"user":"admin","pass":"admin"}],"udp":true,"ip":"127.0.0.1"}',
                 "sniffing": '{"enabled":false,"destOverride":["http","tls","quic","fakedns"],"metadataOnly":false,"routeOnly":false}',
                 "allocator": '{"strategy":"always","refresh":5,"concurrency":3}',
-                "enable": 1
+                "enable": 1,
+                "tag": ""  # 设置默认值
             }
 
         config["inbounds"].append(user_data)
