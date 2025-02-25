@@ -54,17 +54,6 @@ def add_users_to_db(protocol, num_users, start_port):
                     }
                 ]
             }
-            stream_settings = {
-                "network": "tcp",
-                "security": "none",
-                "externalProxy": [],
-                "tcpSettings": {
-                    "acceptProxyProtocol": False,
-                    "header": {
-                        "type": "none"
-                    }
-                }
-            }
             sniffing = {
                 "enabled": False,
                 "destOverride": ["http", "tls", "quic", "fakedns"],
@@ -82,7 +71,6 @@ def add_users_to_db(protocol, num_users, start_port):
                 "port": port,
                 "protocol": protocol,
                 "settings": settings,
-                "streamSettings": stream_settings,
                 "sniffing": sniffing,
                 "allocator": allocator
             }
@@ -107,7 +95,7 @@ def add_users_to_db(protocol, num_users, start_port):
 
     conn.commit()
     conn.close()
-
+    
 # 更新配置文件
 def update_config_file(protocol, num_users, start_port):
     config_path = "/usr/local/x-ui/bin/config.json"
