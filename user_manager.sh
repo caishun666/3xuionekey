@@ -90,8 +90,8 @@ def add_users_to_db(protocol, num_users, start_port):
                 "enable": 1
             }
 
-        cursor.execute("INSERT INTO inbounds (remark, port, protocol, settings, sniffing, allocator) VALUES (?, ?, ?, ?, ?, ?)",
-               (user_data["remark"], user_data["port"], user_data["protocol"], json.dumps(user_data["settings"]), json.dumps(user_data.get("sniffing", {})), json.dumps(user_data.get("allocator", {}))))
+        cursor.execute("INSERT INTO inbounds (remark, port, protocol, settings, stream_settings, sniffing, allocate) VALUES (?, ?, ?, ?, ?, ?, ?)",
+               (user_data["remark"], user_data["port"], user_data["protocol"], json.dumps(user_data["settings"]), json.dumps(user_data.get("streamSettings", {})), json.dumps(user_data.get("sniffing", {})), json.dumps(user_data.get("allocator", {}))))
 
     conn.commit()
     conn.close()
